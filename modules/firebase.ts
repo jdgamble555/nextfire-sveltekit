@@ -12,6 +12,7 @@ import {
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { readable, type Subscriber } from 'svelte/store';
+import { getStorage } from "firebase/storage";
 
 
 const firebaseConfig = {
@@ -32,7 +33,7 @@ export interface Auth {
     email: string;
 }
 
-getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // interface for database record, not firebase record
 export interface UserRec {
@@ -41,7 +42,8 @@ export interface UserRec {
     displayName?: string;
 }
 
-const auth = getAuth();
+const auth = getAuth(firebaseApp);
+export const storage = getStorage(firebaseApp);
 
 export async function loginWithGoogle() {
     return await signInWithPopup(auth, new GoogleAuthProvider());
