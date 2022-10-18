@@ -1,6 +1,6 @@
 <script lang="ts">
-	export const user: any = null;
-	export const username = null;
+	import { userData } from '$lib/database';
+	$: ({ user, username } = $userData);
 </script>
 
 <nav class="navbar">

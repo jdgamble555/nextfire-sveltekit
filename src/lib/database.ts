@@ -12,7 +12,8 @@ import {
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { readable, type Subscriber } from 'svelte/store';
-import { getStorage } from "firebase/storage";
+//import { getStorage } from 'firebase/storage';
+import { doc, getFirestore, onSnapshot } from 'firebase/firestore';
 
 
 const firebaseConfig = {
@@ -43,7 +44,8 @@ export interface UserRec {
 }
 
 const auth = getAuth(firebaseApp);
-export const storage = getStorage(firebaseApp);
+//const storage = getStorage(firebaseApp);
+export const firestore = getFirestore(firebaseApp);
 
 export async function loginWithGoogle() {
     return await signInWithPopup(auth, new GoogleAuthProvider());
@@ -91,6 +93,22 @@ export async function confirmSignIn(url: string, email?: string): Promise<boolea
     return false;
 }
 
-export const user = readable<User | null>(null, (set: Subscriber<User | null>) =>
-    onIdTokenChanged(auth, (u: User | null) => u ? set(u) : set(null))
-);
+export const userData = readable({ username: null, user: null },
+    (set: Subscriber<{ user: User | null, username: string | null }>) => {
+
+        // make sure logged in
+        return onIdTokenChanged(auth, (user: User | null) => {
+            let unsubscribe;
+            let username: string | null = null;
+            if (user) {
+                set({ user, username: null });
+                // check for username doc
+                const ref = doc(firestore, 'users', user.uid);
+                unsubscribe = onSnapshot(ref, (_doc) => {
+                    username = _doc.exists() ? _doc.data()?.username : null;
+                    set({ user, username });
+                });
+            }
+            return unsubscribe;
+        });
+    });
