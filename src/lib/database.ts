@@ -3,10 +3,8 @@ import { getApp, getApps, initializeApp } from 'firebase/app';
 import {
     getAuth,
     GoogleAuthProvider,
-    isSignInWithEmailLink,
     onIdTokenChanged,
-    sendSignInLinkToEmail,
-    signInWithEmailLink,
+    signInAnonymously,
     signInWithPopup,
     signOut
 } from 'firebase/auth';
@@ -47,51 +45,9 @@ const auth = getAuth(firebaseApp);
 //const storage = getStorage(firebaseApp);
 export const firestore = getFirestore(firebaseApp);
 
-export async function loginWithGoogle() {
-    return await signInWithPopup(auth, new GoogleAuthProvider());
-}
-
-export async function logout() {
-    return await signOut(auth);
-}
-
-export async function sendEmailLink(host: string, email: string, isDev = false): Promise<void> {
-    const actionCodeSettings = {
-        // Your redirect URL
-        url: (isDev ? 'http://' : 'https://') + host,
-        handleCodeInApp: true,
-    };
-    try {
-        await sendSignInLinkToEmail(
-            auth,
-            email,
-            actionCodeSettings
-        );
-        localStorage.setItem('emailForSignIn', email);
-    } catch (e: any) {
-        console.error(e);
-    }
-}
-
-export async function confirmSignIn(url: string, email?: string): Promise<boolean> {
-    if (!email) {
-        email = localStorage.getItem('emailForSignIn') || undefined;
-    }
-    try {
-        if (isSignInWithEmailLink(auth, url)) {
-            // login user and remove the email localStorage
-            if (email) {
-                const r = await signInWithEmailLink(auth as any, email, url)
-                localStorage.removeItem('emailForSignIn');
-                await auth.updateCurrentUser(r.user);
-                return true;
-            }
-        }
-    } catch (e: any) {
-        console.error(e);
-    }
-    return false;
-}
+export const loginWithGoogle = async () => await signInWithPopup(auth, new GoogleAuthProvider());
+export const logout = async () => await signOut(auth);
+export const loginAnonymously = async () => await signInAnonymously(auth);
 
 export const userData = readable({ username: null, user: null },
     (set: Subscriber<{ user: User | null, username: string | null }>) => {
@@ -101,7 +57,6 @@ export const userData = readable({ username: null, user: null },
             let unsubscribe;
             let username: string | null = null;
             if (user) {
-                set({ user, username: null });
                 // check for username doc
                 const ref = doc(firestore, 'users', user.uid);
                 unsubscribe = onSnapshot(ref, (_doc) => {
@@ -109,6 +64,7 @@ export const userData = readable({ username: null, user: null },
                     set({ user, username });
                 });
             }
+            set({ user, username: null });
             return unsubscribe;
         });
     });

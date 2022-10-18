@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Username from '$components/username.svelte';
-	import { loginWithGoogle, logout, userData } from '$lib/database';
+	import { loginWithGoogle, logout, userData, loginAnonymously } from '$lib/database';
 	$: ({ user, username } = $userData);
 </script>
 
@@ -15,5 +15,6 @@
 		<button class="btn-google" on:click={loginWithGoogle}>
 			<img src="/google.png" alt="Sign in with Google" /> Sign in with Google
 		</button>
+		<button on:click={loginAnonymously}> Sign in Anonymously </button>
 	{/if}
 </main>

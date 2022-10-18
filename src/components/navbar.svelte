@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { userData } from '$lib/database';
+	import { logout, userData } from '$lib/database';
 	$: ({ user, username } = $userData);
 </script>
 
@@ -14,13 +14,16 @@
 		<!-- user is signed-in and has username -->
 		{#if username}
 			<li class="push-left">
+				<button on:click={logout}>Sign Out</button>
+			</li>
+			<li>
 				<a href="/admin">
 					<button class="btn-blue">Write Posts</button>
 				</a>
 			</li>
 			<li>
 				<a href={`/${username}`}>
-					<img alt={user?.displayName} src={user?.photoURL} />
+					<img alt={user?.displayName} src={user?.photoURL || '/hacker.png'} />
 				</a>
 			</li>
 
