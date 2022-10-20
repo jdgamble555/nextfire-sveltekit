@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import {
@@ -9,9 +10,9 @@ import {
     signOut
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
-import { readable, type Subscriber } from 'svelte/store';
+import { readable, writable, type Subscriber } from 'svelte/store';
 //import { getStorage } from 'firebase/storage';
-import { doc, getFirestore, onSnapshot } from 'firebase/firestore';
+import { collection, doc, DocumentReference, DocumentSnapshot, getDoc, getDocs, getFirestore, limit, onSnapshot, Query, query, QuerySnapshot, where, type DocumentData } from 'firebase/firestore';
 
 
 const firebaseConfig = {
@@ -68,3 +69,66 @@ export const userData = readable({ username: null, user: null },
             return unsubscribe;
         });
     });
+
+/**`
+* Gets a users/{uid} document with username
+* @param  {string} username
+*/
+export async function getUserWithUsername(username: string) {
+    // const usersRef = collection(firestore, 'users');
+    // const query = usersRef.where('username', '==', username).limit(1);
+
+    const q = query(
+        collection(firestore, 'users'),
+        where('username', '==', username),
+        limit(1)
+    )
+    const userDoc = (await getDocs(q)).docs[0];
+    return userDoc;
+}
+
+/**`
+ * Converts a firestore document to JSON
+ * @param  {DocumentSnapshot} doc
+ */
+export function postToJSON(doc: DocumentSnapshot) {
+    const data = doc.data();
+    return {
+        ...data,
+        // Gotcha! firestore timestamp NOT serializable to JSON. Must convert to milliseconds
+        createdAt: data!.createdAt.toMillis(),
+        updatedAt: data!.updatedAt.toMillis(),
+    };
+}
+
+export const docSnap = <T>(docRef: DocumentReference<T>) => {
+    return readable<DocumentSnapshot<T> | null>(null, (set) => {
+        return onSnapshot(docRef, (snap) => {
+            set(snap.exists() ? snap : null);
+        });
+    });
+}
+
+export const docData = <T>(docRef: DocumentReference<T>) => {
+    return readable<T | null>(null, (set) => {
+        return onSnapshot(docRef, (snap) => {
+            set(snap.exists() ? snap.data() : null);
+        });
+    });
+}
+
+export const docDataOnce = <T>(docRef: DocumentReference<T>) => {
+    return readable<T | null>(null, (set) => {
+        getDoc(docRef).then((snap) => {
+            set(snap.exists() ? snap.data() : null);
+        });
+    });
+}
+
+export const collectionSnap = <T = DocumentData>(ref: Query) => {
+    return readable<QuerySnapshot<T> | null>(null, (set) => {
+        return onSnapshot(ref, (snap) => {
+            set(!snap.empty ? snap as QuerySnapshot<T> : null)
+        });
+    });
+}

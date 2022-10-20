@@ -1,5 +1,5 @@
 <script lang="ts">
-	export const show = false;
+	export let show = false;
 </script>
 
 {#if show}
