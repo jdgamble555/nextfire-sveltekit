@@ -10,9 +10,10 @@ import {
     signOut
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
-import { readable, writable, type Subscriber } from 'svelte/store';
+import { readable, type Subscriber } from 'svelte/store';
 //import { getStorage } from 'firebase/storage';
 import { collection, doc, DocumentReference, DocumentSnapshot, getDoc, getDocs, getFirestore, limit, onSnapshot, Query, query, QuerySnapshot, where, type DocumentData } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 
 const firebaseConfig = {
@@ -43,6 +44,7 @@ export interface UserRec {
 }
 
 const auth = getAuth(firebaseApp);
+export const storage = getStorage(firebaseApp);
 //const storage = getStorage(firebaseApp);
 export const firestore = getFirestore(firebaseApp);
 
@@ -51,7 +53,9 @@ export const logout = async () => await signOut(auth);
 export const loginAnonymously = async () => await signInAnonymously(auth);
 
 export const userData = readable({ username: null, user: null },
-    (set: Subscriber<{ user: User | null, username: string | null }>) => {
+    (set: Subscriber<{
+        [x: string]: any; user: User | null, username: string | null
+    }>) => {
 
         // make sure logged in
         return onIdTokenChanged(auth, (user: User | null) => {

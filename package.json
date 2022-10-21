@@ -33,6 +33,7 @@
 	"type": "module",
 	"dependencies": {
 		"firebase": "^9.12.1",
+		"svelte-forms-lib": "^2.0.1",
 		"svelte-french-toast": "^1.0.3",
 		"svelte-markdown": "^0.2.3"
 	}

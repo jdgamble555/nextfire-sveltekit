@@ -31,8 +31,12 @@
 		</a>
 		{#if post.published}
 			<p class="text-success">Live</p>
-			:
+		{:else}
 			<p class="text-danger">Unpublished</p>
 		{/if}
 	{/if}
 </div>
+
+<style>
+	@import '$styles/post.module.css';
+</style>

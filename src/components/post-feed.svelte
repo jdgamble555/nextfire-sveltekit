@@ -4,6 +4,8 @@
 	export let admin = false;
 </script>
 
-{#each posts as post}
-	<Post {admin} {post} />
-{/each}
+{#if posts}
+	{#each posts as post}
+		<Post {admin} {post} />
+	{/each}
+{/if}
