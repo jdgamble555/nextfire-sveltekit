@@ -7,20 +7,20 @@ export const load: PageServerLoad = async ({ params }) => {
   const { username, slug } = params;
   const userDoc = await getUserWithUsername(username);
 
-  let post;
+  let _post;
   let path;
 
   if (userDoc) {
     // const postRef = userDoc.ref.collection('posts').doc(slug);
     const postRef = doc(getFirestore(), userDoc.ref.path, 'posts', slug);
 
-    post = postToJSON(await getDoc(postRef));
+    _post = postToJSON(await getDoc(postRef));
 
     path = postRef.path;
   }
 
   return {
-    props: { post, path },
+    props: { _post, path },
     //revalidate: 100,
   };
 };

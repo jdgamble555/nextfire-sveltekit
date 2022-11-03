@@ -136,3 +136,11 @@ export const collectionSnap = <T = DocumentData>(ref: Query) => {
         });
     });
 }
+
+export const collectionData = <T = DocumentData>(ref: Query) => {
+    return readable<T[] | null>(null, (set) => {
+        return onSnapshot(ref, (snap) => {
+            set(!snap.empty ? snap.docs.map((doc) => doc.data() as T) : null);
+        });
+    });
+}
