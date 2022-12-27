@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { PageServerData } from './$types';
+	import type { PageServerData } from './$types.js';
 	import Loader from '$components/loader.svelte';
 	import {
 		collectionGroup,
