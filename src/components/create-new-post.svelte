@@ -20,7 +20,6 @@
 
 	// Create a new post in firestore
 	const createPost = async (e: Event) => {
-		e.preventDefault();
 		const uid = $userData.user!.uid;
 		const ref = doc(getFirestore(), 'users', uid, 'posts', slug);
 
@@ -50,7 +49,7 @@
 	};
 </script>
 
-<form on:submit={createPost}>
+<form on:submit|preventDefault={createPost}>
 	<input value={title} on:input={onChange} placeholder="My Awesome Article!" class="input" />
 	<p>
 		<strong>Slug:</strong>
