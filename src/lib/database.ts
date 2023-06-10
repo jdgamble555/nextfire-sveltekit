@@ -23,10 +23,13 @@ import {
     query,
     QuerySnapshot,
     where,
-    type DocumentData
+    type DocumentData,
+    collectionGroup,
+    orderBy
 } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
+const LIMIT = 10;
 
 const firebaseConfig = {
     projectId: 'test-projects-19046',
@@ -116,6 +119,31 @@ export async function getUserWithUsername(username: string) {
     )
     const userDoc = (await getDocs(q)).docs[0];
     return userDoc;
+}
+
+export async function getPosts() {
+    const ref = collectionGroup(firestore, 'posts');
+    const postsQuery = query(
+        ref,
+        where('published', '==', true),
+        orderBy('createdAt', 'desc'),
+        limit(LIMIT),
+    );
+    return (await getDocs(postsQuery)).docs.map(postToJSON);
+}
+
+export function getPostRef(path: string, slug: string) {
+    return doc(firestore, path, 'posts', slug);
+}
+
+export async function getUserPosts(path: string) {
+    const postsQuery = query(
+        collection(firestore, path, 'posts'),
+        where('published', '==', true),
+        orderBy('createdAt', 'desc'),
+        limit(5)
+    );
+    return (await getDocs(postsQuery)).docs.map(postToJSON);
 }
 
 /**`

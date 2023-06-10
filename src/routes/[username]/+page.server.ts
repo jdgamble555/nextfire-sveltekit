@@ -1,42 +1,23 @@
-import { firestore, getUserWithUsername, postToJSON } from '$lib/database';
-import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
+import { getUserPosts, getUserWithUsername } from '$lib/database';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load = (async ({ params }) => {
     const { username } = params;
-
-   /* setHeaders({
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': '*'
-    }); */
 
     const userDoc = await getUserWithUsername(username);
 
     // If no user, short circuit to 404 page
     if (!userDoc) {
         return {
-            notFound: true,
+            notFound: true
         };
     }
 
-    // JSON serializable data
-    let user = null;
-    let posts = null;
-
-    if (userDoc) {
-        user = userDoc.data();
-
-        const postsQuery = query(
-            collection(firestore, userDoc.ref.path, 'posts'),
-            where('published', '==', true),
-            orderBy('createdAt', 'desc'),
-            limit(5)
-        );
-        posts = (await getDocs(postsQuery)).docs.map(postToJSON);
-    }
-
     return {
-        props: { user, posts }, // will be passed to the page component as props
+        props: {
+            user: userDoc.data(),
+            posts: getUserPosts(userDoc.ref.path)
+        }
     };
-};
+    
+}) satisfies PageServerLoad;

@@ -1,26 +1,25 @@
-import { firestore, getUserWithUsername, postToJSON } from '$lib/database';
-import { doc, getDoc } from 'firebase/firestore';
+import { getPostRef, getUserWithUsername, postToJSON } from '$lib/database';
+import { getDoc } from 'firebase/firestore';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load = (async ({ params }) => {
 
   const { username, slug } = params;
   const userDoc = await getUserWithUsername(username);
 
-  let _post;
-  let path;
-
-  if (userDoc) {
-    // const postRef = userDoc.ref.collection('posts').doc(slug);
-    const postRef = doc(firestore, userDoc.ref.path, 'posts', slug);
-
-    _post = postToJSON(await getDoc(postRef));
-
-    path = postRef.path;
+  if (!userDoc) {
+    return {
+      notFound: true
+    }
   }
 
+  const postRef = getPostRef(userDoc.ref.path, slug);
+
   return {
-    props: { _post, path },
-    //revalidate: 100,
+    props: {
+      _post: getDoc(postRef).then(postToJSON),
+      path: postRef.path
+    }
   };
-};
+  
+}) satisfies PageServerLoad;
