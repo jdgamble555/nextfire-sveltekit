@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Username from '$components/username.svelte';
-	import { loginWithGoogle, logout, userData, loginAnonymously } from '$lib/database';
+	import { loginWithGoogle, logout, loginAnonymously, useUserData } from '$lib/database';
+
+	const userData = useUserData();
 	$: ({ user, username } = $userData);
 </script>
 

@@ -28,6 +28,7 @@ import {
     orderBy
 } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { useSharedStore } from './use-shared-store';
 
 const LIMIT = 10;
 
@@ -80,7 +81,7 @@ export const logout = async () => {
     await signOut(_auth);
 };
 
-export const userData = readable({ username: null, user: null },
+const userData = () => readable({ username: null, user: null },
     (set: Subscriber<{
         [x: string]: any; user: User | null, username: string | null
     }>) => {
@@ -103,6 +104,8 @@ export const userData = readable({ username: null, user: null },
         });
         return unsub;
     });
+
+    export const useUserData = () => useSharedStore('user', userData);
 
 /**`
 * Gets a users/{uid} document with username

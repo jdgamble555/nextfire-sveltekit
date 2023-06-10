@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { doc, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore';
 	import toast from 'svelte-french-toast';
-	import { userData } from '$lib/database';
+	import { useUserData } from '$lib/database';
 	import { goto } from '$app/navigation';
 
 	const kebabCase = (s: string) => {
@@ -10,6 +10,7 @@
 	};
 	let title = '';
 
+	const userData = useUserData();
 	const { username } = $userData;
 
 	// Ensure slug is URL safe

@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { logout, userData } from '$lib/database';
+	import { logout, useUserData } from '$lib/database';
+
+	const userData = useUserData();
 	$: ({ user, username } = $userData);
 </script>
 

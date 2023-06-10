@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { collectionData, userData } from '$lib/database';
+	import { collectionData, useUserData } from '$lib/database';
 	import { collection, getFirestore, orderBy, query } from 'firebase/firestore';
 
 	import PostFeed from './post-feed.svelte';
 
+	const userData = useUserData();
 	const uid = $userData.user!.uid;
 
 	const ref = collection(getFirestore(), 'users', uid, 'posts');

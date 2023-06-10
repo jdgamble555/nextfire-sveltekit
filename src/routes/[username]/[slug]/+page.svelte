@@ -2,7 +2,7 @@
 	import AuthCheck from '$components/auth-check.svelte';
 	import HeartButton from '$components/heart-button.svelte';
 	import PostContent from '$components/post-content.svelte';
-	import { docData, userData } from '$lib/database';
+	import { docData, useUserData } from '$lib/database';
 	import type { PageServerData } from './$types';
 	import { doc, getFirestore } from 'firebase/firestore';
 	import Metatags from '$components/metatags.svelte';
@@ -14,6 +14,7 @@
 
 	const postRef = doc(getFirestore(), path);
 
+	const userData = useUserData();
 	$: ({ user } = $userData);
 
 	const post = derived<any, any>(docData(postRef), (doc, set) => set(doc ?? _post));

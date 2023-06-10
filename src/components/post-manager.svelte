@@ -1,11 +1,13 @@
 <script lang="ts">
 	import DeletePostButton from './delete-post-button.svelte';
-	import { userData } from '$lib/database';
+	
 	import { doc, getFirestore } from 'firebase/firestore';
-	import { docDataOnce } from '$lib/database';
+	import { docDataOnce, useUserData } from '$lib/database';
 	import { page } from '$app/stores';
 	import PostForm from './post-form.svelte';
 	import { onDestroy } from 'svelte';
+
+	const userData = useUserData();
 
 	let preview = false;
 

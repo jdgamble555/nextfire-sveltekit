@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { userData } from '$lib/database';
+	import { useUserData } from '$lib/database';
 
 	export let fallback = false;
 
+	const userData = useUserData();
 	$: ({ username } = $userData);
 </script>
 

@@ -1,11 +1,13 @@
 <script lang="ts">
-	import { firestore, userData } from '$lib/database';
+	import { firestore, useUserData } from '$lib/database';
 	import debounce from '$lib/debounce';
 	import { doc, getDoc, writeBatch } from 'firebase/firestore';
 
 	let loading = false;
 	let isValid = false;
 	let username: string | null = null;
+
+	const userData = useUserData();
 
 	const onSubmit = async () => {
 		const { user } = $userData;

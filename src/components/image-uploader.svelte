@@ -1,12 +1,14 @@
 <script lang="ts">
-	import { userData } from '$lib/database';
+	
 	import Loader from './loader.svelte';
 	import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-	import { storage } from '$lib/database';
+	import { storage, useUserData } from '$lib/database';
 
 	let uploading = false;
 	let progress = 0;
 	let downloadURL: any = null;
+
+	const userData = useUserData();
 
 	// Creates a Firebase Upload Task
 	const uploadFile = async (e: any) => {
