@@ -49,7 +49,7 @@ export interface Auth {
     email: string;
 }
 
-const firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 // interface for database record, not firebase record
 export interface UserRec {
@@ -129,7 +129,7 @@ export async function getPosts() {
         orderBy('createdAt', 'desc'),
         limit(LIMIT),
     );
-    return getDocs(postsQuery).then((_q) => _q.docs.map(postToJSON));
+    return await getDocs(postsQuery).then((_q) => _q.docs.map(postToJSON));
 }
 
 export async function getPost(path: string, slug: string) {
