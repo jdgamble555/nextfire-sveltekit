@@ -2,11 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import {
-    getAuth,
     GoogleAuthProvider,
     onIdTokenChanged,
-    signInAnonymously,
-    signInWithPopup,
     signOut
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
@@ -58,37 +55,50 @@ export interface UserRec {
     displayName?: string;
 }
 
-const auth = () => getAuth(firebaseApp);
+const auth = async () => (await import('firebase/auth')).getAuth(firebaseApp);
 
 
 export const storage = getStorage(firebaseApp);
 //const storage = getStorage(firebaseApp);
 export const firestore = getFirestore(firebaseApp);
 
-export const loginWithGoogle = async () => await signInWithPopup(auth(), new GoogleAuthProvider());
-export const logout = async () => await signOut(auth());
-export const loginAnonymously = async () => await signInAnonymously(auth());
+export const loginWithGoogle = async () => {
+    const _auth = await auth();
+    return (await import('firebase/auth')).signInWithPopup(_auth, new GoogleAuthProvider());
+};
+
+export const loginAnonymously = async () => {
+    const _auth = await auth();
+    return (await import('firebase/auth')).signInAnonymously(_auth);
+};
+
+export const logout = async () => {
+    const _auth = await auth();
+    await signOut(_auth);
+};
 
 export const userData = readable({ username: null, user: null },
     (set: Subscriber<{
         [x: string]: any; user: User | null, username: string | null
     }>) => {
-
-        // make sure logged in
-        return onIdTokenChanged(auth(), (user: User | null) => {
-            let unsubscribe;
-            let username: string | null = null;
-            if (user) {
+        let unsub;
+        auth().then((_auth) => {
+            // make sure logged in
+            unsub = onIdTokenChanged(_auth, (user: User | null) => {
+                let username: string | null = null;
+                if (!user) {
+                    set({ user, username: null });
+                    return;
+                }
                 // check for username doc
                 const ref = doc(firestore, 'users', user.uid);
-                unsubscribe = onSnapshot(ref, (_doc) => {
+                return onSnapshot(ref, (_doc) => {
                     username = _doc.exists() ? _doc.data()?.username : null;
                     set({ user, username });
                 });
-            }
-            set({ user, username: null });
-            return unsubscribe;
+            });
         });
+        return unsub;
     });
 
 /**`
