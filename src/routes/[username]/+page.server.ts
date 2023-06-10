@@ -13,10 +13,12 @@ export const load = (async ({ params }) => {
         };
     }
 
+    const posts = getUserPosts(userDoc.ref.path);
+
     return {
         props: {
             user: userDoc.data(),
-            posts: getUserPosts(userDoc.ref.path)
+            posts
         }
     };
     

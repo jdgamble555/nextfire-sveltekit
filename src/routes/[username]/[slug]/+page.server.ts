@@ -1,5 +1,4 @@
-import { getPostRef, getUserWithUsername, postToJSON } from '$lib/database';
-import { getDoc } from 'firebase/firestore';
+import { getPost, getUserWithUsername } from '$lib/database';
 import type { PageServerLoad } from './$types';
 
 export const load = (async ({ params }) => {
@@ -13,13 +12,13 @@ export const load = (async ({ params }) => {
     }
   }
 
-  const postRef = getPostRef(userDoc.ref.path, slug);
+  const { _post, path } = await getPost(userDoc.ref.path, slug);
 
   return {
     props: {
-      _post: getDoc(postRef).then(postToJSON),
-      path: postRef.path
+      _post,
+      path
     }
   };
-  
+
 }) satisfies PageServerLoad;

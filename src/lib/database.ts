@@ -129,11 +129,15 @@ export async function getPosts() {
         orderBy('createdAt', 'desc'),
         limit(LIMIT),
     );
-    return (await getDocs(postsQuery)).docs.map(postToJSON);
+    return getDocs(postsQuery).then((_q) => _q.docs.map(postToJSON));
 }
 
-export function getPostRef(path: string, slug: string) {
-    return doc(firestore, path, 'posts', slug);
+export async function getPost(path: string, slug: string) {
+    const postRef = doc(firestore, path, 'posts', slug);
+    return {
+        _post: await getDoc(postRef).then(postToJSON),
+        path: postRef.path
+    };
 }
 
 export async function getUserPosts(path: string) {
