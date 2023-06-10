@@ -1,15 +1,15 @@
-import { getUserWithUsername, postToJSON } from '$lib/database';
-import { collection, getDocs, getFirestore, limit, orderBy, query, where } from 'firebase/firestore';
+import { firestore, getUserWithUsername, postToJSON } from '$lib/database';
+import { collection, getDocs, limit, orderBy, query, where } from 'firebase/firestore';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, setHeaders }) => {
+export const load: PageServerLoad = async ({ params }) => {
     const { username } = params;
 
-    setHeaders({
+   /* setHeaders({
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': '*'
-    });
+    }); */
 
     const userDoc = await getUserWithUsername(username);
 
@@ -28,7 +28,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
         user = userDoc.data();
 
         const postsQuery = query(
-            collection(getFirestore(), userDoc.ref.path, 'posts'),
+            collection(firestore, userDoc.ref.path, 'posts'),
             where('published', '==', true),
             orderBy('createdAt', 'desc'),
             limit(5)
