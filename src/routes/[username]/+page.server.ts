@@ -13,7 +13,7 @@ export const load = (async ({ params }) => {
         };
     }
 
-    const posts = getUserPosts(userDoc.ref.path);
+    const posts = await getUserPosts(userDoc.ref.path);
 
     return {
         props: {

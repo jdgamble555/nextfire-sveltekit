@@ -109,45 +109,47 @@ export const userData = readable({ username: null, user: null },
 * @param  {string} username
 */
 export async function getUserWithUsername(username: string) {
-    // const usersRef = collection(firestore, 'users');
-    // const query = usersRef.where('username', '==', username).limit(1);
-
-    const q = query(
-        collection(firestore, 'users'),
-        where('username', '==', username),
-        limit(1)
-    )
-    const userDoc = (await getDocs(q)).docs[0];
+    const userDoc = (await getDocs(
+        query(
+            collection(firestore, 'users'),
+            where('username', '==', username),
+            limit(1)
+        )
+    )).docs[0];
     return userDoc;
 }
 
 export async function getPosts() {
-    const ref = collectionGroup(firestore, 'posts');
-    const postsQuery = query(
-        ref,
-        where('published', '==', true),
-        orderBy('createdAt', 'desc'),
-        limit(LIMIT),
-    );
-    return await getDocs(postsQuery).then((_q) => _q.docs.map(postToJSON));
+    const posts = await getDocs(
+        query(
+            collectionGroup(firestore, 'posts'),
+            where('published', '==', true),
+            orderBy('createdAt', 'desc'),
+            limit(LIMIT)
+        )
+    ).then((_q) => _q.docs.map(postToJSON));
+    return posts;
 }
 
 export async function getPost(path: string, slug: string) {
     const postRef = doc(firestore, path, 'posts', slug);
+    const _post = await getDoc(postRef).then(postToJSON);
     return {
-        _post: await getDoc(postRef).then(postToJSON),
-        path: postRef.path
+        path: postRef.path,
+        _post
     };
 }
 
 export async function getUserPosts(path: string) {
-    const postsQuery = query(
-        collection(firestore, path, 'posts'),
-        where('published', '==', true),
-        orderBy('createdAt', 'desc'),
-        limit(5)
-    );
-    return (await getDocs(postsQuery)).docs.map(postToJSON);
+    const posts = await getDocs(
+        query(
+            collection(firestore, path, 'posts'),
+            where('published', '==', true),
+            orderBy('createdAt', 'desc'),
+            limit(5)
+        )
+    ).then((_q) => _q.docs.map(postToJSON));
+    return posts;
 }
 
 /**`
