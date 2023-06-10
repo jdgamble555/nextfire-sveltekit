@@ -2,7 +2,13 @@ import { getUserWithUsername, postToJSON } from '$lib/database';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, setHeaders }) => {
+
+  setHeaders({
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': '*'
+  });
 
   const { username, slug } = params;
   const userDoc = await getUserWithUsername(username);
